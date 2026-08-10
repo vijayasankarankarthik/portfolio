@@ -1,29 +1,23 @@
-import Nav from "./components/Nav.jsx";
-import TraceLine from "./components/TraceLine.jsx";
-import Hero from "./components/Hero.jsx";
-import WhatIBuild from "./components/WhatIBuild.jsx";
-import Experience from "./components/Experience.jsx";
-import Skills from "./components/Skills.jsx";
-import Projects from "./components/Projects.jsx";
-import Direction from "./components/Direction.jsx";
-import Response from "./components/Response.jsx";
-import Footer from "./components/Footer.jsx";
+import { lazy, Suspense } from 'react';
+import Nav from './components/Nav.jsx';
+import Footer from './components/Footer.jsx';
+
+// Lazy-load the 3D scene so the page shell loads instantly
+const SystemScene = lazy(() => import('./3d/SystemScene.jsx'));
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-ink font-body text-paper">
+    <>
+      {/* Fixed nav — sits on top of the canvas */}
       <Nav />
-      <TraceLine />
-      <main>
-        <Hero />
-        <WhatIBuild />
-        <Experience />
-        <Skills />
-        <Projects />
-        <Direction />
-        <Response />
-      </main>
+
+      {/* 3D System Scene — the entire portfolio experience */}
+      <Suspense fallback={<div className="scene-loading" />}>
+        <SystemScene />
+      </Suspense>
+
+      {/* Footer absolutely positioned at the bottom of the scroll area */}
       <Footer />
-    </div>
+    </>
   );
 }
