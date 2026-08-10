@@ -1,16 +1,8 @@
 import { useEffect, useState } from 'react';
 
-const LINKS = [
-  { href: '#hero',       label: 'System' },
-  { href: '#experience', label: 'Experience' },
-  { href: '#projects',   label: 'Projects' },
-  { href: '#contact',    label: 'Contact' },
-];
-
-// Layer labels that change as you scroll
 const LAYERS = [
   { threshold: 0.00, label: 'Layer: Client' },
-  { threshold: 0.12, label: 'Layer: Gateway' },
+  { threshold: 0.12, label: 'Layer: API Gateway' },
   { threshold: 0.24, label: 'Layer: Auth' },
   { threshold: 0.40, label: 'Layer: Services' },
   { threshold: 0.58, label: 'Layer: Data' },
@@ -30,142 +22,146 @@ function getCurrentLayer(progress) {
 export default function Nav() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [layerLabel, setLayerLabel] = useState(LAYERS[0].label);
+  const [scrollEl, setScrollEl] = useState(null);
+
+  // Find the ScrollControls scroll container after mount
+  useEffect(() => {
+    const find = () => {
+      const el = document.querySelector('canvas + div') ?? document.querySelector('[style*="overflow"]');
+      if (el) { setScrollEl(el); return true; }
+      return false;
+    };
+    if (!find()) {
+      const t = setTimeout(find, 500);
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   useEffect(() => {
-    // Listen to the R3F scroll container (it's the only scrollable element in fixed canvas mode)
-    // We track document scroll as a proxy (window scroll events from ScrollControls)
+    if (!scrollEl) return;
     const handleScroll = () => {
-      const el = document.querySelector('[data-scroll]') ?? document.documentElement;
-      const maxScroll = el.scrollHeight - el.clientHeight;
-      const progress = maxScroll > 0 ? el.scrollTop / maxScroll : 0;
+      const maxScroll = scrollEl.scrollHeight - scrollEl.clientHeight;
+      const progress = maxScroll > 0 ? scrollEl.scrollTop / maxScroll : 0;
       setScrollProgress(progress);
       setLayerLabel(getCurrentLayer(progress));
     };
+    scrollEl.addEventListener('scroll', handleScroll, { passive: true });
+    return () => scrollEl.removeEventListener('scroll', handleScroll);
+  }, [scrollEl]);
 
-    // ScrollControls mounts an overflow:auto div — find it
-    const scrollEl = document.querySelector('canvas')?.parentElement?.parentElement;
-    const target = scrollEl ?? window;
-    target.addEventListener('scroll', handleScroll, { passive: true });
-    return () => target.removeEventListener('scroll', handleScroll);
-  }, []);
+  const scrollToTop = () => {
+    if (scrollEl) scrollEl.scrollTop = 0;
+  };
 
   return (
-    <header
-      style={{
-        position: 'fixed',
-        top: 0,
+    <header style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 100,
+      borderBottom: '1px solid rgba(10,31,22,0.8)',
+      background: 'rgba(5,11,9,0.80)',
+      backdropFilter: 'blur(18px)',
+      WebkitBackdropFilter: 'blur(18px)',
+    }}>
+      {/* Scroll progress bar */}
+      <div style={{
+        position: 'absolute',
+        bottom: 0,
         left: 0,
-        right: 0,
-        zIndex: 100,
-        borderBottom: '1px solid rgba(28,38,33,0.7)',
-        background: 'rgba(6,13,11,0.75)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-      }}
-    >
-      {/* Progress bar */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          height: '1px',
-          width: `${scrollProgress * 100}%`,
-          background: 'linear-gradient(90deg, #7fe6b8, #4fae87)',
-          transition: 'width 0.1s ease',
-        }}
-      />
+        height: '1px',
+        width: `${scrollProgress * 100}%`,
+        background: 'linear-gradient(90deg, #00c8a0, #4ade80)',
+        transition: 'width 0.12s linear',
+      }} />
 
-      <div
-        style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '14px 24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
+      <div style={{
+        maxWidth: '1280px',
+        margin: '0 auto',
+        padding: '13px 28px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '16px',
+      }}>
         {/* Logo + layer indicator */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', minWidth: 0 }}>
           <button
-            onClick={() => {
-              const el = document.querySelector('canvas')?.parentElement?.parentElement;
-              if (el) el.scrollTop = 0;
-            }}
+            onClick={scrollToTop}
             style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '14px',
-              letterSpacing: '0.12em',
-              color: '#f4f2ea',
+              fontFamily: 'monospace',
+              fontSize: '13px',
+              letterSpacing: '0.14em',
+              color: '#e2e8e4',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
+              flexShrink: 0,
+              padding: 0,
             }}
           >
-            VSK<span style={{ color: '#7fe6b8' }}>.</span>dev
+            VSK<span style={{ color: '#00c8a0' }}>.</span>dev
           </button>
-          <span
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '9px',
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: '#4fae87',
-              borderLeft: '1px solid #1c2621',
-              paddingLeft: '16px',
-            }}
-          >
+          <span style={{
+            fontFamily: 'monospace',
+            fontSize: '9px',
+            letterSpacing: '0.24em',
+            textTransform: 'uppercase',
+            color: '#00c8a0',
+            borderLeft: '1px solid rgba(10,31,22,0.9)',
+            paddingLeft: '16px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+          }}>
             {layerLabel}
           </span>
         </div>
 
-        {/* Nav links */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
-          <div style={{ display: 'flex', gap: '24px' }}>
-            {LINKS.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                style={{
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: '10px',
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  color: '#8a9690',
-                  textDecoration: 'none',
-                  transition: 'color 0.2s',
-                }}
-                onMouseEnter={(e) => (e.target.style.color = '#7fe6b8')}
-                onMouseLeave={(e) => (e.target.style.color = '#8a9690')}
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
+        {/* Nav actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexShrink: 0 }}>
+          {/* Resume download — in nav */}
+          <a
+            href="/resume.pdf"
+            download="Vijaya_Sankaran_Karthik_Resume.pdf"
+            style={{
+              fontFamily: 'monospace',
+              fontSize: '10px',
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              color: '#00c8a0',
+              textDecoration: 'none',
+              opacity: 0.85,
+              transition: 'opacity 0.15s',
+            }}
+            onMouseEnter={(e) => (e.target.style.opacity = '1')}
+            onMouseLeave={(e) => (e.target.style.opacity = '0.85')}
+          >
+            ↓ Resume
+          </a>
 
           <a
             href="https://github.com/vijayasankarankarthik"
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: 'monospace',
               fontSize: '10px',
-              letterSpacing: '0.18em',
+              letterSpacing: '0.16em',
               textTransform: 'uppercase',
-              color: '#7fe6b8',
-              border: '1px solid rgba(127,230,184,0.35)',
+              color: '#00c8a0',
+              border: '1px solid rgba(0,200,160,0.3)',
               padding: '6px 14px',
               borderRadius: '3px',
               textDecoration: 'none',
-              transition: 'background 0.2s, color 0.2s',
+              transition: 'background 0.15s, color 0.15s',
             }}
-            onMouseEnter={(e) => { e.target.style.background = '#7fe6b8'; e.target.style.color = '#060d0b'; }}
-            onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.color = '#7fe6b8'; }}
+            onMouseEnter={(e) => { e.target.style.background = '#00c8a0'; e.target.style.color = '#050b09'; }}
+            onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.color = '#00c8a0'; }}
           >
             GitHub ↗
           </a>
-        </nav>
+        </div>
       </div>
     </header>
   );

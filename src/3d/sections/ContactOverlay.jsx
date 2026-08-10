@@ -1,30 +1,30 @@
 /**
- * ContactOverlay.jsx
- * Education & contact — bottom of the scene
+ * ContactOverlay.jsx — Education (no CGPA/marks) + contact links + Resume download
  */
 export default function ContactOverlay() {
   return (
-    <div style={{ width: '420px', pointerEvents: 'auto' }}>
+    <div style={{ width: '440px', pointerEvents: 'auto' }}>
       <p className="overlay-eyebrow">Education & contact</p>
 
-      <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px' }}>
-        {/* Education */}
+      <div style={{ marginTop: '22px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px' }}>
+        {/* Education — NO CGPA, NO marks */}
         <div>
-          <p className="skill-group-label">Education</p>
-          <p className="overlay-section-title" style={{ marginTop: '10px', fontSize: '15px' }}>
+          <p className="skill-group-label" style={{ color: '#00c8a0' }}>Education</p>
+          <p className="overlay-section-title" style={{ marginTop: '10px', fontSize: '14px', lineHeight: '1.4' }}>
             B.Tech, Electronics &amp; Communication Engineering
           </p>
           <p className="overlay-body" style={{ marginTop: '6px' }}>
-            SASTRA Deemed University<br />Kumbakonam — 2022–2026
+            SASTRA Deemed University<br />Kumbakonam · 2022 – 2026
           </p>
         </div>
 
         {/* Contact */}
         <div>
-          <p className="skill-group-label">Let's build</p>
+          <p className="skill-group-label" style={{ color: '#00c8a0' }}>Let's connect</p>
           <p className="overlay-body" style={{ marginTop: '10px' }}>
-            Open to backend engineering roles — especially teams working close to
-            distributed systems and scalable architecture.
+            Open to backend engineering and software engineer roles —
+            especially teams working on distributed systems, platform
+            engineering, or scalable infrastructure.
           </p>
           <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <a
@@ -47,8 +47,26 @@ export default function ContactOverlay() {
         </div>
       </div>
 
-      <div style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid #1c2621' }}>
-        <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#4fae87' }}>
+      {/* Resume download — prominent in contact section */}
+      <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid rgba(28,38,33,0.7)' }}>
+        <a
+          href="/resume.pdf"
+          download="Vijaya_Sankaran_Karthik_Resume.pdf"
+          className="cta-primary"
+          style={{ display: 'inline-block' }}
+        >
+          ↓ Download Resume
+        </a>
+      </div>
+
+      <div style={{ marginTop: '20px' }}>
+        <p style={{
+          fontFamily: 'monospace',
+          fontSize: '9px',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          color: 'rgba(0,200,160,0.35)',
+        }}>
           VSK.dev — Backend Engineer
         </p>
       </div>

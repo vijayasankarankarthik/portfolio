@@ -1,10 +1,8 @@
 /**
- * SystemEdge.jsx
+ * SystemEdge.jsx — Improved tube connections with semantic colors
  *
- * A connection between two nodes in the 3D scene.
- * - TubeGeometry along a CatmullRomCurve3 path
- * - Animated data-packet (sphere) that travels along the tube
- * - Dashed edges use a different material for async paths
+ * Sync connections (solid): deep teal tubes, cyan-teal packets
+ * Async connections (dashed): slightly lighter tube, rose-tinted packets
  */
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -14,9 +12,8 @@ import { COLORS } from './sceneConfig';
 function buildPath(fromPos, toPos) {
   const [fx, fy, fz] = fromPos;
   const [tx, ty, tz] = toPos;
-  // Add a subtle midpoint arc for visual clarity
   const midX = (fx + tx) / 2;
-  const midY = (fy + ty) / 2 + 0.4;
+  const midY = (fy + ty) / 2 + 0.5;
   const midZ = (fz + tz) / 2;
   return new THREE.CatmullRomCurve3([
     new THREE.Vector3(fx, fy, fz),
@@ -27,7 +24,7 @@ function buildPath(fromPos, toPos) {
 
 export default function SystemEdge({ edge, fromNode, toNode, speed = 1.0, prefersReduced = false }) {
   const packetRef = useRef();
-  const tRef = useRef(Math.random()); // stagger packets
+  const tRef = useRef(Math.random());
 
   const curve = useMemo(
     () => buildPath(fromNode.position, toNode.position),
@@ -35,48 +32,49 @@ export default function SystemEdge({ edge, fromNode, toNode, speed = 1.0, prefer
   );
 
   const tubeGeometry = useMemo(
-    () => new THREE.TubeGeometry(curve, 32, 0.018, 6, false),
+    () => new THREE.TubeGeometry(curve, 40, 0.016, 5, false),
     [curve]
   );
 
-  const points = useMemo(() => curve.getPoints(100), [curve]);
-
   useFrame((_, delta) => {
     if (!packetRef.current || prefersReduced) return;
-    tRef.current = (tRef.current + delta * speed * 0.18) % 1;
+    tRef.current = (tRef.current + delta * speed * 0.16) % 1;
     const pt = curve.getPoint(tRef.current);
     packetRef.current.position.copy(pt);
+    // Fade in/out at endpoints
+    const t = tRef.current;
     packetRef.current.material.opacity =
-      tRef.current < 0.05 || tRef.current > 0.95
-        ? Math.sin(tRef.current < 0.05 ? tRef.current * 20 * Math.PI : (1 - tRef.current) * 20 * Math.PI)
-        : 1;
+      t < 0.06 ? t / 0.06 : t > 0.94 ? (1 - t) / 0.06 : 1;
   });
 
-  const edgeColor = edge.dashed ? '#1d3a2d' : '#153026';
+  // Sync edges: dark teal tube / cyan packet
+  // Async edges: slightly more visible tube / pink packet
+  const tubeColor  = edge.dashed ? '#162a22' : '#0d2218';
+  const tubeOpacity = edge.dashed ? 0.45 : 0.65;
   const packetColor = edge.dashed ? COLORS.queue : COLORS.particle;
+  const packetSize  = edge.dashed ? 0.07 : 0.09;
 
   return (
     <group>
-      {/* Tube */}
       <mesh geometry={tubeGeometry}>
         <meshStandardMaterial
-          color={edgeColor}
-          emissive={edgeColor}
-          emissiveIntensity={0.3}
-          roughness={0.6}
-          metalness={0.1}
+          color={tubeColor}
+          emissive={tubeColor}
+          emissiveIntensity={0.5}
+          roughness={0.5}
+          metalness={0.2}
           transparent
-          opacity={edge.dashed ? 0.4 : 0.6}
+          opacity={tubeOpacity}
         />
       </mesh>
 
-      {/* Data packet sphere */}
+      {/* Data packet */}
       <mesh ref={packetRef}>
-        <sphereGeometry args={[0.085, 8, 8]} />
+        <sphereGeometry args={[packetSize, 8, 8]} />
         <meshStandardMaterial
           color={packetColor}
           emissive={packetColor}
-          emissiveIntensity={1.2}
+          emissiveIntensity={2.5}
           transparent
           opacity={1}
         />

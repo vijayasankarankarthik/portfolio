@@ -1,6 +1,6 @@
 /**
- * ExperienceOverlay.jsx
- * Experience section — shown when camera is near the service layer
+ * ExperienceOverlay.jsx — Accurate resume content, backend-framed
+ * No ERP/accounting framing. Emphasizes Java, Spring, auth, DB work.
  */
 const ROLES = [
   {
@@ -9,29 +9,30 @@ const ROLES = [
     time: 'Feb 2026 — Present',
     active: true,
     points: [
-      'Built backend APIs in Spring Boot — user management, authentication flows, data operations.',
-      'Worked with PostgreSQL, Spring Data JPA/Hibernate to manage relational data models.',
-      'Implemented JWT-based authentication, Spring Security RBAC on protected API routes.',
-      'Documented with Swagger/OpenAPI, validated endpoints through systematic Postman test cases.',
+      'Built backend APIs in Spring Boot — user management, authentication flows, and data operations serving production traffic.',
+      'Designed and queried PostgreSQL schemas with Spring Data JPA and Hibernate; wrote raw SQL for performance-critical paths.',
+      'Implemented JWT-based stateless authentication and Spring Security RBAC across protected API routes.',
+      'Followed layered architecture (Controller → Service → Repository) with full API documentation via Swagger/OpenAPI.',
+      'Used Git and GitHub for version control; validated all endpoints through systematic test cases with Bruno.',
     ],
   },
   {
     org: 'BSNL Ltd.',
     title: 'Industrial Training Intern',
-    time: 'Nov 2024 · 1 week',
+    time: 'November 2024 · 1 week',
     active: false,
     points: [
-      'Exposure to telecom network infrastructure and enterprise operational workflows.',
-      'Observed switching, transmission, and subscriber management systems.',
+      'Exposure to telecom network infrastructure — switching, transmission, and subscriber management systems.',
+      'Observed enterprise operational workflows in a large-scale public sector environment.',
     ],
   },
 ];
 
 export default function ExperienceOverlay() {
   return (
-    <div style={{ width: '360px', pointerEvents: 'auto' }}>
+    <div style={{ width: '370px', pointerEvents: 'auto' }}>
       <p className="overlay-eyebrow">Experience</p>
-      <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '26px' }}>
         {ROLES.map((role) => (
           <div key={role.org}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
@@ -40,10 +41,11 @@ export default function ExperienceOverlay() {
             </div>
             <p className="overlay-section-title">{role.org}</p>
             <p className="overlay-role-title">{role.title}</p>
-            <ul style={{ marginTop: '10px', paddingLeft: '0', listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <ul style={{ marginTop: '10px', listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {role.points.map((p, i) => (
                 <li key={i} className="overlay-bullet">
-                  <span style={{ color: '#4fae87', marginRight: '8px' }}>›</span>{p}
+                  <span style={{ color: '#00c8a0', marginRight: '8px', flexShrink: 0 }}>›</span>
+                  <span>{p}</span>
                 </li>
               ))}
             </ul>
